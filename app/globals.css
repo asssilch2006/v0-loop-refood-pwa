@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .glass {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+  .glass-strong {
+    @apply bg-card/90 backdrop-blur-2xl border border-border/60;
+  }
+}
+
+@layer base {
+  :root {
+    /* Modern Eco-Chic Theme - Light */
+    --background: 150 20% 97%;
+    --foreground: 160 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 25% 10%;
+    /* Emerald Green Primary */
+    --primary: 158 64% 35%;
+    --primary-foreground: 0 0% 100%;
+    /* Earthy Teal Secondary */
+    --secondary: 174 42% 92%;
+    --secondary-foreground: 174 50% 25%;
+    /* Muted Sage */
+    --muted: 150 15% 93%;
+    --muted-foreground: 160 10% 45%;
+    /* Sunset Orange Accent (for discounts) */
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+    /* Teal for success states */
+    --success: 174 50% 40%;
+    --success-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 15% 88%;
+    --input: 150 15% 93%;
+    --ring: 158 64% 35%;
+    /* Chart colors - eco palette */
+    --chart-1: 158 64% 35%;
+    --chart-2: 174 50% 40%;
+    --chart-3: 24 95% 53%;
+    --chart-4: 150 30% 50%;
+    --chart-5: 40 90% 55%;
+    --radius: 0.75rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 160 25% 10%;
+    --sidebar-primary: 158 64% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 174 42% 92%;
+    --sidebar-accent-foreground: 174 50% 25%;
+    --sidebar-border: 150 15% 88%;
+    --sidebar-ring: 158 64% 35%;
+  }
+  .dark {
+    /* Modern Eco-Chic Theme - Dark */
+    --background: 160 20% 6%;
+    --foreground: 150 15% 95%;
+    --card: 160 15% 10%;
+    --card-foreground: 150 15% 95%;
+    --popover: 160 15% 10%;
+    --popover-foreground: 150 15% 95%;
+    /* Emerald Green Primary */
+    --primary: 158 60% 45%;
+    --primary-foreground: 160 25% 5%;
+    /* Earthy Teal Secondary */
+    --secondary: 174 30% 18%;
+    --secondary-foreground: 174 40% 80%;
+    /* Muted */
+    --muted: 160 15% 15%;
+    --muted-foreground: 150 10% 60%;
+    /* Sunset Orange Accent */
+    --accent: 24 95% 55%;
+    --accent-foreground: 0 0% 100%;
+    /* Teal for success */
+    --success: 174 50% 45%;
+    --success-foreground: 0 0% 100%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 160 15% 18%;
+    --input: 160 15% 18%;
+    --ring: 158 60% 45%;
+    /* Chart colors - eco palette dark */
+    --chart-1: 158 60% 45%;
+    --chart-2: 174 50% 45%;
+    --chart-3: 24 95% 55%;
+    --chart-4: 150 40% 40%;
+    --chart-5: 40 85% 50%;
+    --sidebar-background: 160 15% 8%;
+    --sidebar-foreground: 150 15% 95%;
+    --sidebar-primary: 158 60% 45%;
+    --sidebar-primary-foreground: 160 25% 5%;
+    --sidebar-accent: 174 30% 18%;
+    --sidebar-accent-foreground: 174 40% 80%;
+    --sidebar-border: 160 15% 18%;
+    --sidebar-ring: 158 60% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* RTL Support for Arabic */
+  [dir="rtl"] {
+    text-align: right;
+  }
+}

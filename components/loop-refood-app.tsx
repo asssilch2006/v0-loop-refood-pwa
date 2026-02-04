@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 import { LanguageProvider } from "@/lib/i18n";
 import { AppStateProvider, useAppState } from "@/lib/app-state";
 import { SplashScreen } from "./splash-screen";
@@ -13,9 +14,10 @@ import { ConsumerHomeScreen } from "./consumer-home-screen";
 import { SellerDashboardScreen } from "./seller-dashboard-screen";
 import { SettingsScreen } from "./settings-screen";
 import { BottomNavigation } from "./bottom-navigation";
+import { SidebarDrawer } from "./sidebar-drawer";
 
 function AppContent() {
-  const { currentScreen, isAuthenticated } = useAppState();
+  const { currentScreen, isAuthenticated, accessibilityMode } = useAppState();
 
   const showNavigation =
     isAuthenticated &&
@@ -23,8 +25,17 @@ function AppContent() {
       currentScreen === "seller-dashboard" ||
       currentScreen === "settings");
 
+  // Apply high contrast mode on mount if accessibility is enabled
+  useEffect(() => {
+    if (accessibilityMode) {
+      document.documentElement.classList.add("high-contrast");
+    } else {
+      document.documentElement.classList.remove("high-contrast");
+    }
+  }, [accessibilityMode]);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <AnimatePresence mode="wait">
         {currentScreen === "splash" && <SplashScreen key="splash" />}
         {currentScreen === "onboarding" && <OnboardingScreen key="onboarding" />}
@@ -46,6 +57,7 @@ function AppContent() {
       </AnimatePresence>
 
       {showNavigation && <BottomNavigation />}
+      {isAuthenticated && <SidebarDrawer />}
     </div>
   );
 }

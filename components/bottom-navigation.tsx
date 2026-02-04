@@ -6,10 +6,10 @@ import {
   Search,
   Heart,
   ShoppingBag,
-  Settings,
   LayoutDashboard,
   Package,
   BarChart3,
+  MapPin,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useAppState, type AppScreen } from "@/lib/app-state";
@@ -25,21 +25,20 @@ type NavItem = {
 const consumerNavItems: NavItem[] = [
   { id: "home", icon: Home, labelKey: "home", screen: "consumer-home" },
   { id: "search", icon: Search, labelKey: "search", screen: "consumer-home" },
+  { id: "map", icon: MapPin, labelKey: "nearYou", screen: "consumer-home" },
   { id: "favorites", icon: Heart, labelKey: "favorites", screen: "consumer-home" },
   { id: "orders", icon: ShoppingBag, labelKey: "orders", screen: "consumer-home" },
-  { id: "settings", icon: Settings, labelKey: "settings", screen: "settings" },
 ];
 
 const sellerNavItems: NavItem[] = [
   { id: "dashboard", icon: LayoutDashboard, labelKey: "dashboard", screen: "seller-dashboard" },
   { id: "inventory", icon: Package, labelKey: "inventory", screen: "seller-dashboard" },
   { id: "analytics", icon: BarChart3, labelKey: "analytics", screen: "seller-dashboard" },
-  { id: "settings", icon: Settings, labelKey: "settings", screen: "settings" },
 ];
 
 export function BottomNavigation() {
   const { t } = useLanguage();
-  const { user, currentScreen, setCurrentScreen } = useAppState();
+  const { user, currentScreen, speak, accessibilityMode } = useAppState();
 
   const navItems = user?.role === "seller" ? sellerNavItems : consumerNavItems;
   
@@ -53,16 +52,22 @@ export function BottomNavigation() {
 
   const activeTab = getActiveTab();
 
+  const handleNavClick = (item: NavItem) => {
+    if (accessibilityMode) {
+      speak(t(item.labelKey));
+    }
+  };
+
   return (
     <motion.nav
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", damping: 20 }}
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
     >
       {/* Glassmorphism background */}
-      <div className="mx-4 mb-4 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/50 shadow-xl shadow-foreground/5">
-        <div className="flex items-center justify-around py-2">
+      <div className="mx-3 mb-3 rounded-2xl bg-card/90 backdrop-blur-xl border border-border/50 shadow-xl shadow-foreground/5">
+        <div className="flex items-center justify-around py-2 px-1">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             const Icon = item.icon;
@@ -70,23 +75,23 @@ export function BottomNavigation() {
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentScreen(item.screen)}
-                className="relative flex flex-col items-center px-4 py-2"
+                onClick={() => handleNavClick(item)}
+                className="relative flex flex-col items-center px-2 py-2 min-w-0 flex-1"
               >
                 <motion.div
                   whileTap={{ scale: 0.9 }}
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
+                    "flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
                     isActive
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-muted"
                   )}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-4 w-4" />
                 </motion.div>
                 <span
                   className={cn(
-                    "mt-1 text-[10px] font-medium transition-colors",
+                    "mt-1 text-[9px] font-medium transition-colors truncate max-w-full",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >
@@ -95,7 +100,7 @@ export function BottomNavigation() {
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
-                    className="absolute -bottom-1 h-1 w-6 rounded-full bg-primary"
+                    className="absolute -bottom-0.5 h-0.5 w-5 rounded-full bg-primary"
                     transition={{ type: "spring", damping: 20 }}
                   />
                 )}

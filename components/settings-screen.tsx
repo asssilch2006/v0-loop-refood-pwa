@@ -10,8 +10,10 @@ import {
   LogOut,
   ChevronRight,
   Check,
+  Accessibility,
+  Volume2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLanguage, type Language } from "@/lib/i18n";
@@ -26,7 +28,7 @@ const languages: { code: Language; name: string; nativeName: string }[] = [
 
 export function SettingsScreen() {
   const { t, language, setLanguage } = useLanguage();
-  const { user, setUser, setCurrentScreen } = useAppState();
+  const { user, setUser, setCurrentScreen, accessibilityMode, setAccessibilityMode, speak } = useAppState();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [notifications, setNotifications] = useState({
     newOffers: true,
@@ -43,6 +45,16 @@ export function SettingsScreen() {
     setCurrentScreen(user?.role === "seller" ? "seller-dashboard" : "consumer-home");
   };
 
+  const handleAccessibilityToggle = (checked: boolean) => {
+    setAccessibilityMode(checked);
+    if (checked) {
+      document.documentElement.classList.add("high-contrast");
+      speak("Accessibility mode enabled");
+    } else {
+      document.documentElement.classList.remove("high-contrast");
+    }
+  };
+
   // Impact stats (mock data)
   const impactStats = {
     mealsSaved: 47,
@@ -51,7 +63,7 @@ export function SettingsScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 safe-top">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="flex items-center gap-4 px-4 py-4">
@@ -124,11 +136,51 @@ export function SettingsScreen() {
           </div>
         </motion.div>
 
+        {/* Accessibility */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">
+            Accessibility
+          </h3>
+          <div className="rounded-2xl bg-card border border-border/50 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-border/50">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                  <Accessibility className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">High Contrast</p>
+                  <p className="text-xs text-muted-foreground">For color blindness</p>
+                </div>
+              </div>
+              <Switch
+                checked={accessibilityMode}
+                onCheckedChange={handleAccessibilityToggle}
+              />
+            </div>
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                  <Volume2 className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Voice Guidance</p>
+                  <p className="text-xs text-muted-foreground">Screen reader simulation</p>
+                </div>
+              </div>
+              <Switch checked={accessibilityMode} disabled />
+            </div>
+          </div>
+        </motion.div>
+
         {/* Language */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.25 }}
         >
           <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">
             {t("language")}

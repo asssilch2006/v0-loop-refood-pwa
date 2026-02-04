@@ -452,6 +452,60 @@ export const translations: Translations = {
     fr: "Favoris",
     ar: "المفضلة",
   },
+
+  // Accessibility
+  accessibility: {
+    en: "Accessibility",
+    fr: "Accessibilité",
+    ar: "إمكانية الوصول",
+  },
+  highContrast: {
+    en: "High Contrast Mode",
+    fr: "Mode Contraste Élevé",
+    ar: "وضع التباين العالي",
+  },
+  voiceGuidance: {
+    en: "Voice Guidance",
+    fr: "Guidage Vocal",
+    ar: "التوجيه الصوتي",
+  },
+  forColorBlindness: {
+    en: "For color blindness",
+    fr: "Pour daltoniens",
+    ar: "لعمى الألوان",
+  },
+  screenReader: {
+    en: "Screen Reader",
+    fr: "Lecteur d'écran",
+    ar: "قارئ الشاشة",
+  },
+
+  // Map
+  mapView: {
+    en: "Map View",
+    fr: "Vue carte",
+    ar: "عرض الخريطة",
+  },
+  restaurants: {
+    en: "Restaurants",
+    fr: "Restaurants",
+    ar: "مطاعم",
+  },
+  butchers: {
+    en: "Butchers",
+    fr: "Boucheries",
+    ar: "جزارين",
+  },
+  bakeries: {
+    en: "Bakeries",
+    fr: "Boulangeries",
+    ar: "مخابز",
+  },
+  navigate: {
+    en: "Navigate",
+    fr: "Naviguer",
+    ar: "توجيه",
+  },
 };
 
 interface LanguageContextType {

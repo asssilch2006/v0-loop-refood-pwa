@@ -43,10 +43,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
       <body
-        className={`${inter.variable} ${ibmPlexArabic.variable} font-sans antialiased`}
+        className={`${inter.variable} ${ibmPlexArabic.variable} font-sans antialiased overflow-x-hidden`}
       >
-        {children}
+        <div className="min-h-screen w-full max-w-full overflow-x-hidden">
+          {children}
+        </div>
       </body>
     </html>
   );

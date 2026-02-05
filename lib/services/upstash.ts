@@ -113,3 +113,47 @@ export async function invalidateOfferCache() {
     console.error('[v0] Failed to invalidate cache:', error);
   }
 }
+
+// Search by neighborhood name (Algiers-specific)
+export async function searchByNeighborhoodName(neighborhoodName: string) {
+  try {
+    const cacheKey = `neighborhood:${neighborhoodName.toLowerCase()}`;
+    const cached = await redis.get(cacheKey);
+    
+    if (cached) {
+      console.log(`[v0] Returning cached results for ${neighborhoodName}`);
+      return JSON.parse(cached as string);
+    }
+
+    console.log(`[v0] Searching for items in neighborhood: ${neighborhoodName}`);
+    // Results would be populated from vector search results
+    return [];
+  } catch (error) {
+    console.error('[v0] Neighborhood name search failed:', error);
+    return [];
+  }
+}
+
+// Pre-populate Algiers neighborhoods with cache
+export async function initializeAlgiersNeighborhoods() {
+  try {
+    const neighborhoods = [
+      'Algiers Center', 'Hydra', 'Rouiba', 'Bab Ezzouar', 'Hussein Dey',
+      'El Harrach', 'Kouba', 'Bir Mourad Raïs', 'Dely Ibrahim', 'Bab El Oued',
+      'Belouizdad', 'El Biar', 'Bachdjarah', 'Sidi Yahia', 'Staoueli'
+    ];
+
+    for (const neighborhood of neighborhoods) {
+      const cacheKey = `neighborhood:${neighborhood.toLowerCase()}`;
+      await redis.setex(
+        cacheKey,
+        86400, // 24 hour cache
+        JSON.stringify({ neighborhood, stores: [] })
+      );
+    }
+
+    console.log('[v0] Initialized Algiers neighborhoods in cache');
+  } catch (error) {
+    console.error('[v0] Failed to initialize neighborhoods:', error);
+  }
+}

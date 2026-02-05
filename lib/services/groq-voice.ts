@@ -69,3 +69,25 @@ export const VOICE_PROMPTS = {
   itemDetails: 'Provide detailed information about the selected food item for accessibility.',
   priceComparison: 'Compare the original and loop prices and describe the discount.',
 };
+
+// Generate daily green tip via Groq
+export async function generateDailyGreenTip(): Promise<string> {
+  try {
+    const response = await fetch('/api/green-tip', {
+      method: 'GET',
+    });
+
+    if (!response.ok) throw new Error('Failed to generate green tip');
+    
+    const data = await response.json();
+    return data.tip || 'Visit your neighborhood market to discover fresh surplus food!';
+  } catch (error) {
+    console.error('[v0] Green tip generation error:', error);
+    return 'Did you know? You can save food and money while helping the environment with Loop Refood!';
+  }
+}
+
+// Enhanced voice for specific actions
+export async function voiceNotification(message: string, priority: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
+  await generateWebSpeech(message);
+}

@@ -26,6 +26,10 @@ import { useLanguage } from "@/lib/i18n";
 import { useAppState } from "@/lib/app-state";
 import { cn } from "@/lib/utils";
 import { generateVoiceGuidance } from "@/lib/services/groq-voice";
+import { WasteStatisticsDashboard } from "./waste-statistics-dashboard";
+import { SustainabilityBadge } from "./sustainability-badge";
+import { NeighborhoodSearch } from "./neighborhood-search";
+import { getRandomGreenTip } from "@/lib/algerian-waste-data";
 
 type ServiceTab = "resto" | "animal" | "bread" | "map";
 type FoodCategory = "all" | "fastfood" | "coffee" | "sweets";
@@ -252,31 +256,40 @@ const breadItems = [
   },
 ];
 
-// Algerian user reviews with 20+ entries
-const userReviews = [
-  { id: 1, name: "Mohamed Belhadji", location: "Alger Centre", rating: 5, text: "أفضل تطبيق، وفرت الكثير من المال وساعدت في تقليل التبذير!" },
-  { id: 2, name: "Amina Khoudi", location: "Bab El Oued", rating: 5, text: "Excellent service! J'ai trouvé des pâtisseries délicieuses à moitié prix." },
-  { id: 3, name: "Youcef Medjahed", location: "Hussein Dey", rating: 4, text: "تطبيق رائع، الأسعار ممتازة والجودة عالية" },
-  { id: 4, name: "Meriem Saidani", location: "Kouba", rating: 5, text: "Je recommande vivement! Les commerçants sont très gentils." },
-  { id: 5, name: "Lamine Haddad", location: "El Harrach", rating: 5, text: "ممتاز للمزارعين، أجد طعام حيواناتي بأسعار معقولة" },
-  { id: 6, name: "Chahinez Amira", location: "Bir Mourad Raïs", rating: 4, text: "Super application pour économiser et aider l'environnement!" },
-  { id: 7, name: "Karim Djamel", location: "Bachdjarah", rating: 5, text: "الخبز الجاف ممتاز لمواشي، شكراً لوب ريفود" },
-  { id: 8, name: "Fatima Zahra", location: "Belouizdad", rating: 5, text: "Application très pratique, livraison rapide!" },
-  { id: 9, name: "Amine Rachid", location: "El Biar", rating: 4, text: "جيد جداً، أنصح الجميع بتجربته" },
-  { id: 10, name: "Sarah Louiza", location: "Sidi Yahia", rating: 5, text: "Les prix sont imbattables! J'utilise l'app tous les jours." },
-  { id: 11, name: "Wassim Tahar", location: "Oued Smar", rating: 5, text: "شكراً على هذا التطبيق الرائع، وفرت كثيراً" },
-  { id: 12, name: "Nadia Benouar", location: "Bir Khadem", rating: 4, text: "Très bon concept, je soutiens à 100%!" },
-  { id: 13, name: "Hamza Farah", location: "Bab Ezzouar", rating: 5, text: "أفضل تطبيق للاقتصاد الدائري في الجزائر" },
-  { id: 14, name: "Lynda Messaoui", location: "Rouiba", rating: 5, text: "Génial pour trouver de la nourriture pas chère!" },
-  { id: 15, name: "Omar Ghouat", location: "Staoueli", rating: 4, text: "تطبيق مفيد جداً، أتمنى المزيد من المتاجر" },
-  { id: 16, name: "Rania Kaid", location: "Dely Ibrahim", rating: 5, text: "Je fais des économies incroyables chaque semaine!" },
-  { id: 17, name: "Bilal Sahraoui", location: "Cheraga", rating: 5, text: "ممتاز، سهل الاستخدام وموثوق" },
-  { id: 18, name: "Yasmine Hamdi", location: "Draria", rating: 4, text: "Bonne initiative pour réduire le gaspillage alimentaire." },
-  { id: 19, name: "Nordine Boudjemaï", location: "Algiers", rating: 5, text: "تطبيق يغير حياتي، أنصح به بقوة" },
-  { id: 20, name: "Leila Bouhidel", location: "Algiers", rating: 5, text: "Service impeccable, communauté très accueillante!" },
-  { id: 21, name: "Hassan Cherif", location: "Algiers", rating: 4, text: "من أفضل التطبيقات الجزائرية، برافو!" },
-  { id: 22, name: "Soumia Djadjaoui", location: "Algiers", rating: 5, text: "C'est révolutionnaire pour ma famille!" },
-];
+// Authentic Algerian user reviews - Students, Workers, Volunteers
+import { localProfiles } from '@/lib/algerian-waste-data';
+
+const generateUserReviews = () => {
+  const allProfiles = [
+    ...localProfiles.students.map(p => ({
+      id: Math.random(),
+      name: `${p.name} (${p.institution.split(' ')[0]} Student)`,
+      location: p.location,
+      rating: 5,
+      text: p.review,
+      category: 'Student',
+    })),
+    ...localProfiles.workers.map(p => ({
+      id: Math.random(),
+      name: `${p.name} (${p.profession.split(' ')[0]})`,
+      location: p.location,
+      rating: 5,
+      text: p.review,
+      category: 'Worker',
+    })),
+    ...localProfiles.volunteers.map(p => ({
+      id: Math.random(),
+      name: `${p.name} (${p.organization.split(' ')[0]})`,
+      location: p.location,
+      rating: 5,
+      text: p.review,
+      category: 'Volunteer',
+    })),
+  ];
+  return allProfiles;
+};
+
+const userReviews = generateUserReviews();
 
 // Map pins data
 const mapPins = [
@@ -441,7 +454,38 @@ export function ConsumerHomeScreen() {
       </div>
 
       {/* Content */}
-      <div className="px-4 py-4">
+      <div className="px-4 py-4 space-y-6">
+        {/* Daily Green Tip Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 rounded-2xl bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-300 dark:border-green-900/50"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">💡</span>
+            <div>
+              <p className="text-xs font-semibold text-green-900 dark:text-green-300 uppercase tracking-wider">Daily Green Tip</p>
+              <p className="text-sm text-green-800 dark:text-green-200 mt-1">{getRandomGreenTip()}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Sustainability Impact Badge */}
+        <SustainabilityBadge />
+
+        {/* Waste Statistics Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="mb-3">
+            <h2 className="text-base font-semibold text-foreground mb-1">Algerian Food Waste Impact</h2>
+            <p className="text-xs text-muted-foreground">Research-based insights for sustainable living</p>
+          </div>
+          <WasteStatisticsDashboard />
+        </motion.div>
+
         {/* Resto Tab */}
         {activeTab === "resto" && (
           <motion.div
@@ -714,6 +758,16 @@ export function ConsumerHomeScreen() {
             transition={{ duration: 0.3 }}
             className="space-y-4"
           >
+            {/* Neighborhood Search */}
+            <NeighborhoodSearch 
+              onSelect={(neighborhood) => {
+                console.log('[v0] Selected neighborhood:', neighborhood);
+                if (accessibilityMode) {
+                  speak(`Now showing ${neighborhood.name} with ${neighborhood.storeCount} available stores`);
+                }
+              }}
+            />
+
             {/* Interactive Map - Algiers [36.75, 3.05] */}
             <div className="relative h-64 rounded-2xl overflow-hidden bg-muted border border-border/50">
               <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />

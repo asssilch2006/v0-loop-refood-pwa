@@ -217,72 +217,70 @@ export function SidebarDrawer() {
                 </div>
               </motion.div>
 
-              {/* Language */}
+              {/* Language - Top Right Position */}
+              <div className="fixed top-4 right-4 z-[75]">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <button
+                    onClick={() => {
+                      setShowLanguageList(!showLanguageList);
+                      handleMenuClick("Language selection");
+                    }}
+                    className="flex items-center gap-2 p-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors border border-primary/30"
+                  >
+                    <Globe className="h-4 w-4 text-primary" />
+                    <span className="text-xs font-semibold text-primary uppercase">
+                      {language}
+                    </span>
+                  </button>
+
+                  <AnimatePresence>
+                    {showLanguageList && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        className="absolute top-12 right-0 rounded-lg bg-card border border-border shadow-lg overflow-hidden"
+                      >
+                        <div className="w-40 space-y-0">
+                          {languages.map((lang, index) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                setLanguage(lang.code);
+                                setShowLanguageList(false);
+                                handleMenuClick(`Language changed to ${lang.name}`);
+                              }}
+                              className={cn(
+                                "w-full flex items-center justify-between p-3 text-left text-sm font-medium transition-colors",
+                                index !== languages.length - 1 && "border-b border-border/50",
+                                language === lang.code
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-card hover:bg-muted text-foreground"
+                              )}
+                            >
+                              <span>{lang.nativeName}</span>
+                              {language === lang.code && (
+                                <Check className="h-3.5 w-3.5 text-primary" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </div>
+
+              {/* Language Section in Menu */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h3 className="text-xs font-medium text-muted-foreground mb-2 px-1 uppercase tracking-wider">
-                  {t("language")}
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowLanguageList(!showLanguageList);
-                    handleMenuClick("Language selection");
-                  }}
-                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50 hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <Globe className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-medium text-foreground text-sm">
-                      {languages.find((l) => l.code === language)?.nativeName}
-                    </p>
-                  </div>
-                  <ChevronRight
-                    className={cn(
-                      "h-4 w-4 text-muted-foreground transition-transform",
-                      showLanguageList && "rotate-90"
-                    )}
-                  />
-                </button>
-
-                <AnimatePresence>
-                  {showLanguageList && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-2 space-y-1">
-                        {languages.map((lang) => (
-                          <button
-                            key={lang.code}
-                            onClick={() => {
-                              setLanguage(lang.code);
-                              setShowLanguageList(false);
-                              handleMenuClick(`Language changed to ${lang.name}`);
-                            }}
-                            className={cn(
-                              "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
-                              language === lang.code
-                                ? "bg-primary/10 text-primary"
-                                : "bg-muted/30 hover:bg-muted/50 text-foreground"
-                            )}
-                          >
-                            <span className="text-sm font-medium">{lang.nativeName}</span>
-                            {language === lang.code && (
-                              <Check className="h-4 w-4 text-primary" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </motion.div>
 
               {/* Notifications */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   MapPin,
@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   X,
   Navigation,
+  Volume2,
 } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n";
 import { useAppState } from "@/lib/app-state";
 import { cn } from "@/lib/utils";
+import { generateVoiceGuidance } from "@/lib/services/groq-voice";
 
 type ServiceTab = "resto" | "animal" | "bread" | "map";
 type FoodCategory = "all" | "fastfood" | "coffee" | "sweets";
@@ -250,26 +252,30 @@ const breadItems = [
   },
 ];
 
-// Algerian user reviews
+// Algerian user reviews with 20+ entries
 const userReviews = [
-  { id: 1, name: "Mohamed B.", location: "Alger Centre", rating: 5, text: "أفضل تطبيق، وفرت الكثير من المال وساعدت في تقليل التبذير!" },
-  { id: 2, name: "Amina K.", location: "Bab El Oued", rating: 5, text: "Excellent service! J'ai trouvé des pâtisseries délicieuses à moitié prix." },
-  { id: 3, name: "Youcef M.", location: "Hussein Dey", rating: 4, text: "تطبيق رائع، الأسعار ممتازة والجودة عالية" },
-  { id: 4, name: "Meriem S.", location: "Kouba", rating: 5, text: "Je recommande vivement! Les commerçants sont très gentils." },
-  { id: 5, name: "Lamine H.", location: "El Harrach", rating: 5, text: "ممتاز للمزارعين، أجد طعام حيواناتي بأسعار معقولة" },
-  { id: 6, name: "Chahinez A.", location: "Bir Mourad Raïs", rating: 4, text: "Super application pour économiser et aider l'environnement!" },
-  { id: 7, name: "Karim D.", location: "Bachdjarah", rating: 5, text: "الخبز الجاف ممتاز لمواشي، شكراً لوب ريفود" },
-  { id: 8, name: "Fatima Z.", location: "Belouizdad", rating: 5, text: "Application très pratique, livraison rapide!" },
-  { id: 9, name: "Amine R.", location: "El Biar", rating: 4, text: "جيد جداً، أنصح الجميع بتجربته" },
-  { id: 10, name: "Sarah L.", location: "Sidi Yahia", rating: 5, text: "Les prix sont imbattables! J'utilise l'app tous les jours." },
-  { id: 11, name: "Wassim T.", location: "Oued Smar", rating: 5, text: "شكراً على هذا التطبيق الرائع، وفرت كثيراً" },
-  { id: 12, name: "Nadia B.", location: "Bir Khadem", rating: 4, text: "Très bon concept, je soutiens à 100%!" },
-  { id: 13, name: "Hamza F.", location: "Bab Ezzouar", rating: 5, text: "أفضل تطبيق للاقتصاد الدائري في الجزائر" },
-  { id: 14, name: "Lynda M.", location: "Rouiba", rating: 5, text: "Génial pour trouver de la nourriture pas chère!" },
-  { id: 15, name: "Omar G.", location: "Staoueli", rating: 4, text: "تطبيق مفيد جداً، أتمنى المزيد من المتاجر" },
-  { id: 16, name: "Rania K.", location: "Dely Ibrahim", rating: 5, text: "Je fais des économies incroyables chaque semaine!" },
-  { id: 17, name: "Bilal S.", location: "Cheraga", rating: 5, text: "ممتاز، سهل الاستخدام وموثوق" },
-  { id: 18, name: "Yasmine H.", location: "Draria", rating: 4, text: "Bonne initiative pour réduire le gaspillage alimentaire." },
+  { id: 1, name: "Mohamed Belhadji", location: "Alger Centre", rating: 5, text: "أفضل تطبيق، وفرت الكثير من المال وساعدت في تقليل التبذير!" },
+  { id: 2, name: "Amina Khoudi", location: "Bab El Oued", rating: 5, text: "Excellent service! J'ai trouvé des pâtisseries délicieuses à moitié prix." },
+  { id: 3, name: "Youcef Medjahed", location: "Hussein Dey", rating: 4, text: "تطبيق رائع، الأسعار ممتازة والجودة عالية" },
+  { id: 4, name: "Meriem Saidani", location: "Kouba", rating: 5, text: "Je recommande vivement! Les commerçants sont très gentils." },
+  { id: 5, name: "Lamine Haddad", location: "El Harrach", rating: 5, text: "ممتاز للمزارعين، أجد طعام حيواناتي بأسعار معقولة" },
+  { id: 6, name: "Chahinez Amira", location: "Bir Mourad Raïs", rating: 4, text: "Super application pour économiser et aider l'environnement!" },
+  { id: 7, name: "Karim Djamel", location: "Bachdjarah", rating: 5, text: "الخبز الجاف ممتاز لمواشي، شكراً لوب ريفود" },
+  { id: 8, name: "Fatima Zahra", location: "Belouizdad", rating: 5, text: "Application très pratique, livraison rapide!" },
+  { id: 9, name: "Amine Rachid", location: "El Biar", rating: 4, text: "جيد جداً، أنصح الجميع بتجربته" },
+  { id: 10, name: "Sarah Louiza", location: "Sidi Yahia", rating: 5, text: "Les prix sont imbattables! J'utilise l'app tous les jours." },
+  { id: 11, name: "Wassim Tahar", location: "Oued Smar", rating: 5, text: "شكراً على هذا التطبيق الرائع، وفرت كثيراً" },
+  { id: 12, name: "Nadia Benouar", location: "Bir Khadem", rating: 4, text: "Très bon concept, je soutiens à 100%!" },
+  { id: 13, name: "Hamza Farah", location: "Bab Ezzouar", rating: 5, text: "أفضل تطبيق للاقتصاد الدائري في الجزائر" },
+  { id: 14, name: "Lynda Messaoui", location: "Rouiba", rating: 5, text: "Génial pour trouver de la nourriture pas chère!" },
+  { id: 15, name: "Omar Ghouat", location: "Staoueli", rating: 4, text: "تطبيق مفيد جداً، أتمنى المزيد من المتاجر" },
+  { id: 16, name: "Rania Kaid", location: "Dely Ibrahim", rating: 5, text: "Je fais des économies incroyables chaque semaine!" },
+  { id: 17, name: "Bilal Sahraoui", location: "Cheraga", rating: 5, text: "ممتاز، سهل الاستخدام وموثوق" },
+  { id: 18, name: "Yasmine Hamdi", location: "Draria", rating: 4, text: "Bonne initiative pour réduire le gaspillage alimentaire." },
+  { id: 19, name: "Nordine Boudjemaï", location: "Algiers", rating: 5, text: "تطبيق يغير حياتي، أنصح به بقوة" },
+  { id: 20, name: "Leila Bouhidel", location: "Algiers", rating: 5, text: "Service impeccable, communauté très accueillante!" },
+  { id: 21, name: "Hassan Cherif", location: "Algiers", rating: 4, text: "من أفضل التطبيقات الجزائرية، برافو!" },
+  { id: 22, name: "Soumia Djadjaoui", location: "Algiers", rating: 5, text: "C'est révolutionnaire pour ma famille!" },
 ];
 
 // Map pins data
@@ -331,9 +337,31 @@ export function ConsumerHomeScreen() {
     setActiveTab(id);
     if (accessibilityMode) {
       const tab = services.find(s => s.id === id);
-      if (tab) speak(t(tab.labelKey));
+      if (tab) {
+        const tabName = t(tab.labelKey);
+        speak(`Switched to ${tabName} tab`);
+        // Generate AI-enhanced guidance for accessibility
+        generateVoiceGuidance(`User is now viewing the ${tabName} section`).catch(err => 
+          console.error('[v0] Voice guidance error:', err)
+        );
+      }
     }
   };
+
+  // Announce active section when component mounts or accessibility mode changes
+  useEffect(() => {
+    if (accessibilityMode) {
+      const announcement = `Welcome to Loop Refood. You are on the ${t(
+        services.find(s => s.id === activeTab)?.labelKey || 'home'
+      )} section with ${
+        activeTab === 'resto' ? filteredRestoItems.length :
+        activeTab === 'animal' ? animalFoodItems.length :
+        activeTab === 'bread' ? filteredBreadItems.length :
+        'multiple'
+      } items available`;
+      speak(announcement);
+    }
+  }, [accessibilityMode]);
 
   return (
     <div className="min-h-screen bg-background pb-24 safe-top">
@@ -349,6 +377,18 @@ export function ConsumerHomeScreen() {
             >
               <ChevronRight className="h-5 w-5 text-foreground" />
             </button>
+            {accessibilityMode && (
+              <button
+                onClick={() => {
+                  const text = `You are viewing ${user?.location || 'Algiers'} with ${filteredRestoItems.length} food offers, ${animalFoodItems.length} animal food items, and ${breadItems.length} bread items available.`;
+                  speak(text);
+                }}
+                className="flex items-center justify-center h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
+                aria-label="Read current screen"
+              >
+                <Volume2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </button>
+            )}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -674,11 +714,14 @@ export function ConsumerHomeScreen() {
             transition={{ duration: 0.3 }}
             className="space-y-4"
           >
-            {/* Interactive Map */}
+            {/* Interactive Map - Algiers [36.75, 3.05] */}
             <div className="relative h-64 rounded-2xl overflow-hidden bg-muted border border-border/50">
               <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-              {/* Simulated map background */}
-              <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v11/static/3.06,36.75,11,0/400x300?access_token=placeholder')] bg-cover bg-center opacity-60" />
+              {/* Map background - Algiers coordinates */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-emerald-50 dark:from-blue-950 dark:to-emerald-900" />
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                <p className="text-sm">Map View - Algiers [36.75, 3.05]</p>
+              </div>
               
               {/* Map pins */}
               {mapPins.map((pin, i) => (
@@ -856,13 +899,18 @@ export function ConsumerHomeScreen() {
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-h-[80vh] overflow-auto rounded-t-3xl bg-card safe-bottom"
+              className="w-full max-h-[90vh] overflow-auto rounded-t-3xl bg-card safe-bottom"
             >
-              <div className="sticky top-0 bg-card border-b border-border/50 p-4">
+              <div className="sticky top-0 bg-card border-b border-border/50 p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-foreground">
-                    Community Reviews ({userReviews.length})
-                  </h2>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">
+                      Community Reviews
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {userReviews.length} reviews from Algerian users
+                    </p>
+                  </div>
                   <button
                     onClick={() => setShowReviews(false)}
                     className="p-2 rounded-full hover:bg-muted"
@@ -870,30 +918,58 @@ export function ConsumerHomeScreen() {
                     <X className="h-5 w-5" />
                   </button>
                 </div>
+
+                {/* Overall Rating Summary */}
+                <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-primary/5">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">
+                      {(userReviews.reduce((acc, r) => acc + r.rating, 0) / userReviews.length).toFixed(1)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Overall Rating</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-success">
+                      {userReviews.filter(r => r.rating >= 4).length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Positive</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-amber-600">
+                      {userReviews.length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                </div>
               </div>
+
               <div className="p-4 space-y-3">
-                {userReviews.map((review) => (
-                  <div key={review.id} className="p-3 rounded-xl bg-muted/30">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-xs font-bold text-primary">
+                {userReviews.sort((a, b) => b.rating - a.rating).map((review) => (
+                  <motion.div
+                    key={review.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-xl bg-muted/40 hover:bg-muted/60 transition-colors border border-border/50"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">
                             {review.name.charAt(0)}
                           </span>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{review.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{review.location}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground">{review.name}</p>
+                          <p className="text-xs text-muted-foreground">{review.location}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-0.5">
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
                         {Array.from({ length: review.rating }).map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                          <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                         ))}
                       </div>
                     </div>
-                    <p className="text-sm text-foreground">{review.text}</p>
-                  </div>
+                    <p className="text-sm text-foreground leading-relaxed">{review.text}</p>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>

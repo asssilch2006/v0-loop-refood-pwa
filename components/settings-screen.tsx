@@ -167,11 +167,14 @@ export function SettingsScreen() {
                   <Volume2 className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Voice Guidance</p>
-                  <p className="text-xs text-muted-foreground">Screen reader simulation</p>
+                  <p className="font-medium text-foreground">Voice Guidance (Groq AI)</p>
+                  <p className="text-xs text-muted-foreground">AI-powered female voice assistant</p>
                 </div>
               </div>
-              <Switch checked={accessibilityMode} disabled />
+              <Switch 
+                checked={accessibilityMode} 
+                onCheckedChange={handleAccessibilityToggle}
+              />
             </div>
           </div>
         </motion.div>

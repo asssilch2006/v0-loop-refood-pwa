@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
 
 import "./globals.css";
+import "./rtl.css";
 
 const inter = Inter({
   subsets: ["latin"],

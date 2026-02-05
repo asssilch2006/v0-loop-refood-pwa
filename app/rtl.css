@@ -1,0 +1,105 @@
+/* RTL (Right-to-Left) Support for Arabic */
+
+/* Apply when html[dir="rtl"] or html[lang="ar"] */
+html[dir="rtl"],
+html[lang="ar"] {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="rtl"] body,
+html[lang="ar"] body {
+  direction: rtl;
+}
+
+/* Flexbox RTL adjustments */
+html[dir="rtl"] .flex,
+html[lang="ar"] .flex {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .flex-col,
+html[lang="ar"] .flex-col {
+  flex-direction: column;
+}
+
+/* Margin & Padding RTL */
+html[dir="rtl"] .mr-,
+html[lang="ar"] .mr- {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+html[dir="rtl"] .ml-,
+html[lang="ar"] .ml- {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Icons & visual elements */
+html[dir="rtl"] svg,
+html[lang="ar"] svg {
+  transform: scaleX(-1);
+}
+
+/* Sidebar RTL */
+html[dir="rtl"] [role="navigation"],
+html[lang="ar"] [role="navigation"] {
+  right: auto;
+  left: 0;
+}
+
+/* Input and form RTL */
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[lang="ar"] input,
+html[lang="ar"] textarea {
+  text-align: right;
+  direction: rtl;
+}
+
+/* List items RTL */
+html[dir="rtl"] li,
+html[lang="ar"] li {
+  text-align: right;
+}
+
+/* Buttons RTL */
+html[dir="rtl"] button,
+html[lang="ar"] button {
+  text-align: right;
+}
+
+/* Language switcher fix */
+html[dir="rtl"] .fixed.top-4.right-4,
+html[lang="ar"] .fixed.top-4.right-4 {
+  right: 1rem;
+  left: auto;
+}
+
+/* Map container RTL */
+html[dir="rtl"] .relative.rounded-2xl,
+html[lang="ar"] .relative.rounded-2xl {
+  direction: ltr;
+}
+
+/* Modal RTL */
+html[dir="rtl"] .fixed.bottom-0,
+html[lang="ar"] .fixed.bottom-0 {
+  direction: rtl;
+}
+
+/* Ensure proper text alignment for numbers and mixed content */
+html[dir="rtl"] .number,
+html[lang="ar"] .number {
+  direction: ltr;
+  display: inline-block;
+}
+
+/* Transitions and animations preserve RTL */
+html[dir="rtl"] * {
+  transition-property: all;
+  transition-duration: inherit;
+  transition-timing-function: inherit;
+  transition-delay: inherit;
+}

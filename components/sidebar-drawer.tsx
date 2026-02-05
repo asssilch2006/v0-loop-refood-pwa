@@ -20,6 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { useLanguage, type Language } from "@/lib/i18n";
 import { useAppState } from "@/lib/app-state";
 import { cn } from "@/lib/utils";
+import { SustainabilityInsights } from "./sustainability-insights";
 
 const languages: { code: Language; name: string; nativeName: string }[] = [
   { code: "en", name: "English", nativeName: "English" },
@@ -275,12 +276,16 @@ export function SidebarDrawer() {
                 </motion.div>
               </div>
 
-              {/* Language Section in Menu */}
+              {/* Sustainability Insights Section */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
+                <h3 className="text-xs font-medium text-muted-foreground mb-3 px-1 uppercase tracking-wider">
+                  {t("sustainabilityInsights")}
+                </h3>
+                <SustainabilityInsights />
               </motion.div>
 
               {/* Notifications */}
